@@ -206,7 +206,8 @@ Machine code:
 A8 0a 0b
 ```
 
-### CALL register # GOES UP BY NUMBER OF INSTRUCTIONS AND OPERANDS
+### CALL register 
+# GOES UP BY NUMBER OF INSTRUCTIONS AND OPERANDS
 
 `CALL register`
 
