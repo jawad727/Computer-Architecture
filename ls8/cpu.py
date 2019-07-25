@@ -1,10 +1,12 @@
-# Place where instructions are processed
+ # Place where instructions are processed
 """CPU functionality."""
 import sys
 LDI = 0b10000010
 HLT = 0b00000001
 PRN = 0b01000111
 MUL = 0b10100010
+PUSH = 0b01000101
+POP = 0b01000110
 class CPU:
     """Main CPU class."""
     def __init__(self):
@@ -12,6 +14,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
+        self.SP = 7
         
     def __str__(self):
         return f"RAM: {self.ram}, REGISTER: {self.reg}, PC: {self.pc}"
@@ -69,12 +72,11 @@ class CPU:
         ), end='')
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
-        print()
     def run(self):
         """Run the CPU."""
         # determines whether or not this function is "running"
         running = True
-        
+        self.reg[self.SP] = 244
         # IR = _Instruction Register_
         
         
@@ -100,65 +102,27 @@ class CPU:
                
             # HLT = 0b00000001
             elif command == HLT: 
-                print('HLT', num_of_ops)
+                # print('HLT', num_of_ops)
                 running = False
 
             elif command == MUL:
-                print("MUL")
+                # print("MUL")
                 self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
+
+            elif command == PUSH:
+                self.reg[self.SP] -= 1
+                regnum = self.ram[self.pc + 1]
+                value = self.reg[regnum]
+                self.ram[self.reg[self.SP]] = value
+
+            elif command == POP:
+                value = self.ram[self.reg[self.SP]]
+                regnum = self.ram[self.pc + 1]
+                self.reg[regnum] = value
+                self.reg[self.SP] += 1
 
             else: 
                 print(f"unknown instruction: {command}")
                 sys.exit(1)
             
             self.pc += num_of_ops
-    
-
-
-
-
-
-
-# def run(self):
-#         """Run the CPU."""
-#         # determines whether or not this function is "running"
-#         running = True
-        
-#         # IR = _Instruction Register_
-        
-        
-
-#             IR = self.ram_read(self.pc)
-#             command = self.ram[self.pc] 
-#             num_of_ops = int((IR >> 6) & 0b11) + 1
-#             operand_a = self.ram_read(self.pc + 1)
-#             operand_b = self.ram_read(self.pc + 2)
-
-
-
-
-#             # LDI = 0b10000010
-#             if command == LDI:
-#                 # print('LDI', num_of_ops)
-#                 self.reg[operand_a] = operand_b
-            
-#             # PRN = 0b01000111
-#             elif command == PRN:
-#                 # print('PRN', num_of_ops)    
-#                 print(self.reg[operand_a])
-               
-#             # HLT = 0b00000001
-#             elif command == HLT: 
-#                 print('HLT', num_of_ops)
-#                 running = False
-
-#             elif command == MUL:
-#                 print("MUL")
-#                 self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
-
-#             else: 
-#                 print(f"unknown instruction: {command}")
-#                 sys.exit(1)
-            
-#             self.pc += num_of_ops
-    
