@@ -11,6 +11,10 @@ POP = 0b01000110
 CALL = 0b01010000
 RET = 0b0010001
 ADD = 0b10100000
+CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 class CPU:
     """Main CPU class."""
@@ -27,6 +31,7 @@ class CPU:
         self.branch_table[MUL] = self.handle_MUL
         self.branch_table[PUSH] = self.handle_PUSH
         self.branch_table[POP] = self.handle_POP
+        self.FL = 0b010
         
     def __str__(self):
         return f"RAM: {self.ram}, REGISTER: {self.reg}, PC: {self.pc}"
@@ -121,6 +126,7 @@ class CPU:
             operand_b = self.ram_read(self.pc + 2)
                 
             if command == LDI:
+                print("LDI")
                 self.reg[operand_a] = operand_b
 
             elif command == PRN: 
@@ -163,14 +169,42 @@ class CPU:
                 return_addr = self.ram[self.reg[self.SP]]
                 self.reg[self.SP] += 1
 
-                self.pc =return_addr - 1
+                self.pc = return_addr - 1
 
             elif command == ADD:
                 self.reg[operand_a] = self.reg[operand_a] + self.reg[operand_b]
 
+            elif command == CMP:
+                print(f"CMP opA{self.reg[operand_a]} opB{self.reg[operand_b]} ")
+                if self.reg[operand_a] == self.reg[operand_b]:
+                    self.FL = 0b001
+                elif self.reg[operand_a] < self.reg[operand_b]:
+                    self.FL = 0b100
+                elif self.reg[operand_a] > self.reg[operand_b]:
+                    self.FL = 0b010
+                print("FLAGG", self.FL)
+
+            elif command == JMP:
+                print("JMP")
+                self.pc = self.reg[operand_a]
+
+            elif command == JEQ:
+                print("JEQ")
+                if self.FL == 0b001:
+                    self.pc = self.reg[operand_a]
+            elif command == JNE:
+                print("JNE")
+                print(command)
+                if self.FL != 0b001 or self.FL != 0b101 or self.FL != 0b111 or self.FL != 0b011:
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 1
+                print(command)
                 
             else: 
                 print(f"unknown instruction: {command}")
                 sys.exit(1)
                 
             self.pc += num_of_ops
+
+ 
