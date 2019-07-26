@@ -94,6 +94,7 @@ while (running):
         register[SP] += 1
 
         pc =return_addr
+    
 
 
     elif command == HALT:
